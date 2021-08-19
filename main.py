@@ -1,18 +1,23 @@
+"""
+경로 매개변수의 일부가 아닌 다른 함수 매개변수를 선언할 때, "쿼리 매개변수로 자동해석한다.
+"""
 from fastapi import FastAPI
-# API에 대한 모든 기능을 제공하는 파이썬 클래스 FastAPI
-# Starlette를 직접 상속하는 클래스로 Starlette의 모든 기능을 사용가능하다.
 
-app = FastAPI() #FastAPI 클래스의 인스턴스
-# uvicorn main:fastapi --reload
+app = FastAPI()
+
+fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
 
 """
-    POST : 데이터 생성
-    GET : 데이터 읽기
-    PUT : 데이터 업데이트
-    DELETE : 데이터 삭제
+URL의 일부이므로 문자열이다.
+파이썬 타입과 함께 선언할 경우 해당 타입으로 변환되고 검증한다.
 """
 
-@app.get("/") # 경로는 첫번째 / 에서 시작하는 URL의 마지막 부분이다.
-# get동작을 사용하여 URL "/"에 대한 요청을 받을 때마다 FastAPI에 의해 호출된다.
-async def root(): # / 경로가 실행될때 실행하는 함수 , async는 비동기 형식
-    return {"message":"Hello World"} # dict, list 단일값을 가진 str int 등을 반환 할 수 있다.
+
+@app.get("/items/")
+async def read_item(skip: int = 0, limit: int = 10):  # 쿼리 매개변수는 (default)기본값을 가질 수 있다.
+    return fake_items_db[skip: skip + limit] # skip과 limit 퀴리 매개변수를 통해 출력되고 출력되지 않는다.
+
+# 쿼리는 URL에서 ? 후에 나오고 &으로 구분되는 키-값의 쌍의 집합이다.
+# 예를 들어 url에서 http://127.0.0.1:8000/items/?skip=0&limit=10
+# skip - 값 0을 가진다.
+# limit - 값 10을 가진다.
