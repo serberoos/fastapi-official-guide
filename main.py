@@ -1,23 +1,12 @@
-from enum import Enum
 from fastapi import FastAPI
-"""
-Enum 열거형을 이용한 사전 정의 값
 
-"""
-
-class ModelName(str, Enum): # string enum
-    alexnet ="alexnet"
-    resnet = "resnet"
-    lenet = "lenet"
-# 값은 3개 중 1개가 들어가야함 안그럼 오류
 app =FastAPI()
-
-@app.get("/models/{model_name}")
-async def get_model(model_name: ModelName):
-    if model_name == ModelName.alexnet: #모델이름이 알렉스넷
-        return {"model_name": model_name, "message" : "Deep Learning FTW!"}
-
-    if model_name.value == "lenet": #모델이름 값이 lenet
-        return {"model_name": model_name, "message": "LeCNN all the images"}
-
-    return {"model_name ": model_name, "message":"Have some residuals"} # resnet
+"""
+OpenAPI는 경로를 포함하는 경로 매개변수를 내부에 선언하는 방법을 지원하지 않는다.
+지원
+/files/{file_path:path}
+이러한 경우 매개변수의 이름은 file_path이고 마지막 부분 : path는 매개변수가 경로와 일치해야함을 알려준다.
+"""
+@app.get("/files/{file_path:path}")
+async def read_file(file_path: str):
+    return {"file_path": file_path}
