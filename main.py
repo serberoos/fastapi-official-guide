@@ -1,21 +1,32 @@
 """
-Request body + path parameters
-requestbody와 path parameter를 동시에 선언할 수 있다.
-fastapi는 경로 매개변수와 일치하는 함수 매개변수를 경로에서 가져와야한다.
-그리고 Pydantic모델로 선언된 함수 매개변수를 request body에서 가져와야한다는 것을 인지한다.
+Request body + path parameters + query parameter
+
+body path query를 동시에 선언할 수 있다.
+fastapi는 각각을 인식하고 올바른 위치에서 데이터를 가져온다.
 """
 from typing import Optional
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 class Item(BaseModel):
-    name : str
+    name:str
     description : Optional[str] = None
     price :float
-    tax : Optional[float] = None
+    tax :Optional[float] = None
 
-app =FastAPI()
+app = FastAPI()
 
 @app.put("/items/{item_id}")
-async def create_item(item_id: int, item:Item):
-    return {"item_id":item_id, **item.dict()}
+async def create_item(item_id:int, item:Item, q:Optional[str] = None):
+    result = {"item_id":item_id, **item.dict()}
+    if q:
+        result.update({"q":q})
+    return result
+
+"""
+    함수 매개변수는 다음처럼 인식됩니다.
+    - 매개변수가 경로에서도 선언되면 경로 매개변수로 사용된다.
+    - 매개변수가 단일 유형(ex int:float,str,bool 등)인경우 쿼리 매개변수로 해석된다.
+    - 매개변수가 pydantic 모델 유형으로 선언되면 요청본문으로 해석된다.
+"""
